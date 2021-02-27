@@ -1,0 +1,112 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:EtherSound.View"
+                    xmlns:conv="clr-namespace:EtherSound.View.Converters">
+    <conv:AddConverter x:Key="AddConverter" />
+    <conv:MultiplyConverter x:Key="MultiplyConverter" />
+    <SolidColorBrush x:Key="CottonSwabSliderThumb" Color="#FF339933" />
+    <SolidColorBrush x:Key="CottonSwabSliderThumbHover" Color="Red" />
+    <SolidColorBrush x:Key="CottonSwabSliderThumbPressed" Color="Yellow" />
+    <Style x:Key="SliderButtonStyle" TargetType="{x:Type RepeatButton}">
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="IsTabStop" Value="false" />
+        <Setter Property="Focusable" Value="false" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Border Background="Transparent" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="SliderThumbStyle" TargetType="{x:Type Thumb}">
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="Height" Value="18" />
+        <Setter Property="Width" Value="11" />
+        <Setter Property="Background" Value="#F0F0F0" />
+        <Setter Property="Foreground" Value="#ACACAC" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Border Name="Thumb"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding Foreground}"
+                            BorderThickness="1">
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Trigger.Setters>
+                    <Setter Property="Foreground" Value="#7EB4EA" />
+                    <Setter Property="Background" Value="#DCECFC" />
+                </Trigger.Setters>
+            </Trigger>
+            <Trigger Property="IsMouseCaptured" Value="True">
+                <Setter Property="Foreground" Value="#569DE5" />
+                <Setter Property="Background" Value="#DAECFC" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <ControlTemplate x:Key="SliderHorizontal" TargetType="{x:Type Slider}">
+        <Grid>
+            <Border Name="TrackBorder"
+                    Margin="0"
+                    Height="4"
+                    Background="#D6D6D6" />
+            <Border Name="TrackBackground"
+                    Margin="1"
+                    Height="2"
+                    Background="#E7EAEA" />
+            <Border Name="TrackTagBackground"
+                    Margin="1"
+                    Height="2"
+                    HorizontalAlignment="Left">
+                <Border.Width>
+                    <MultiBinding Converter="{StaticResource MultiplyConverter}">
+                        <Binding Path="Tag" RelativeSource="{RelativeSource TemplatedParent}" />
+                        <Binding Path="ActualWidth" RelativeSource="{RelativeSource TemplatedParent}" Converter="{StaticResource AddConverter}" ConverterParameter="-2" />
+                    </MultiBinding>
+                </Border.Width>
+                <Border.Background>
+                    <LinearGradientBrush EndPoint="1,0.5" StartPoint="0,0.5">
+                        <GradientStop Color="#339933" Offset="0"/>
+                        <GradientStop Color="#33CC33" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+            <Track Name="PART_Track">
+                <Track.DecreaseRepeatButton>
+                    <RepeatButton Name="SliderLeft"
+                                  Foreground="Transparent"
+                                  Style="{StaticResource SliderButtonStyle}"
+                                  Command="Slider.DecreaseLarge" />
+                </Track.DecreaseRepeatButton>
+                <Track.Thumb>
+                    <Thumb Name="SliderThumb"
+                           Style="{StaticResource SliderThumbStyle}" />
+                </Track.Thumb>
+                <Track.IncreaseRepeatButton>
+                    <RepeatButton Name="SliderRight"
+                                  Foreground="Transparent"
+                                  Style="{StaticResource SliderButtonStyle}"
+                                  Command="Slider.IncreaseLarge" />
+                </Track.IncreaseRepeatButton>
+            </Track>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.5" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <Style x:Key="{x:Type Slider}" TargetType="{x:Type Slider}">
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="Stylus.IsPressAndHoldEnabled" Value="false"/>
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template" Value="{StaticResource SliderHorizontal}" />
+    </Style>
+</ResourceDictionary>

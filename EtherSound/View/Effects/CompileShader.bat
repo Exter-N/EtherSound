@@ -1,0 +1,2 @@
+@"C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x64\fxc.exe" /O3 /Zpc /T ps_2_0 %1
+@"C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x64\fxc.exe" /O3 /Zpc /T ps_2_0 /Fo %1.ps /nologo %1

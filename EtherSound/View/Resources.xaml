@@ -1,0 +1,52 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:EtherSound.View"
+                    xmlns:conv="clr-namespace:EtherSound.View.Converters"
+                    xmlns:clr="clr-namespace:System;assembly=mscorlib"
+                    xmlns:was="clr-namespace:WASCap;assembly=LibWASCap">
+    <conv:AddConverter x:Key="AddConverter" />
+    <conv:BinarySizeConverter x:Key="BinarySizeConverter" />
+    <conv:BrushConverter x:Key="BrushConverter" />
+    <conv:IsNotNullConverter x:Key="IsNotNullConverter" />
+    <conv:MultiplyConverter x:Key="MultiplyConverter" />
+    <conv:NullableConverter x:Key="NullableConverter" />
+    <conv:OpacityConverter x:Key="OpacityConverter" />
+    <conv:ResourceConverter x:Key="ResourceConverter" />
+    <conv:RoundedPercentageConverter x:Key="RoundedPercentageConverter" />
+    <conv:VisibilityConverter x:Key="VisibilityConverter" />
+    <conv:VolumeIconConverter x:Key="VolumeIconConverter" />
+    <ControlTemplate TargetType="{x:Type Label}" x:Key="HeaderLabel">
+        <Grid Height="{TemplateBinding Height}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Separator Grid.Column="0"/>
+            <Label Grid.Column="1" 
+                    VerticalAlignment="Center" Margin="5 0" Padding="0"
+                    Content="{TemplateBinding Content}"/>
+            <Separator Grid.Column="2" />
+        </Grid>
+    </ControlTemplate>
+    <clr:String x:Key="{x:Static was:Channel.FrontLeft}">Gauche</clr:String>
+    <clr:String x:Key="{x:Static was:Channel.FrontRight}">Droit</clr:String>
+    <clr:String x:Key="{x:Static was:Channel.FrontCenter}">Centre</clr:String>
+    <clr:String x:Key="{x:Static was:Channel.LowFrequency}">Basses</clr:String>
+    <clr:String x:Key="{x:Static was:Channel.BackLeft}">Arrière gauche</clr:String>
+    <clr:String x:Key="{x:Static was:Channel.BackRight}">Arrière droit</clr:String>
+    <clr:String x:Key="{x:Static was:Channel.FrontLeftOfCenter}">Centre-gauche</clr:String>
+    <clr:String x:Key="{x:Static was:Channel.FrontRightOfCenter}">Centre-droit</clr:String>
+    <clr:String x:Key="{x:Static was:Channel.BackCenter}">Arrière centre</clr:String>
+    <clr:String x:Key="{x:Static was:Channel.SideLeft}">Côté gauche</clr:String>
+    <clr:String x:Key="{x:Static was:Channel.SideRight}">Côté droit</clr:String>
+    <clr:String x:Key="{x:Static was:Channel.TopCenter}">Haut</clr:String>
+    <clr:String x:Key="{x:Static was:Channel.TopFrontLeft}">Haut gauche</clr:String>
+    <clr:String x:Key="{x:Static was:Channel.TopFrontCenter}">Haut centre</clr:String>
+    <clr:String x:Key="{x:Static was:Channel.TopFrontRight}">Haut droit</clr:String>
+    <clr:String x:Key="{x:Static was:Channel.TopBackLeft}">Haut arr. gauche</clr:String>
+    <clr:String x:Key="{x:Static was:Channel.TopBackCenter}">Haut arr. centre</clr:String>
+    <clr:String x:Key="{x:Static was:Channel.TopBackRight}">Haut arr. droit</clr:String>
+    <clr:String x:Key="{x:Static was:DataFlow.Render}">Audio du bureau</clr:String>
+    <clr:String x:Key="{x:Static was:DataFlow.Capture}">Microphone</clr:String>
+</ResourceDictionary>

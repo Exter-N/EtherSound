@@ -228,6 +228,11 @@ namespace EtherSound.WebSocket
                 {
                     return;
                 }
+                catch (WebSocketException)
+                {
+                    Dispose();
+                    return;
+                }
             }
         }
 

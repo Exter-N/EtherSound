@@ -140,9 +140,11 @@ namespace EtherSound
 
         public static void EnableBlurBehind(Window window)
         {
-            AccentPolicy accent = new AccentPolicy();
-            accent.AccentState = AccentState.ACCENT_ENABLE_BLURBEHIND;
-            accent.AccentFlags = AccentFlags.DrawLeftBorder | AccentFlags.DrawTopBorder;
+            AccentPolicy accent = new AccentPolicy
+            {
+                AccentState = AccentState.ACCENT_ENABLE_BLURBEHIND,
+                AccentFlags = AccentFlags.DrawLeftBorder | AccentFlags.DrawTopBorder
+            };
 
             var accentStructSize = Marshal.SizeOf(accent);
 
@@ -151,10 +153,12 @@ namespace EtherSound
             {
                 Marshal.StructureToPtr(accent, accentPtr, false);
 
-                WindowCompositionAttributeData data = new WindowCompositionAttributeData();
-                data.Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY;
-                data.SizeOfData = accentStructSize;
-                data.Data = accentPtr;
+                WindowCompositionAttributeData data = new WindowCompositionAttributeData
+                {
+                    Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY,
+                    SizeOfData = accentStructSize,
+                    Data = accentPtr
+                };
 
                 SetWindowCompositionAttribute(new WindowInteropHelper(window).EnsureHandle(), ref data);
             }

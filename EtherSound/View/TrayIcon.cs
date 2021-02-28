@@ -1,13 +1,8 @@
 ﻿using EtherSound.View.Converters;
 using EtherSound.ViewModel;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Forms;
 using Application = System.Windows.Forms.Application;
 using MessageBox = System.Windows.Forms.MessageBox;
@@ -78,6 +73,9 @@ namespace EtherSound.View
                 {
                     case MouseButtons.Left:
                         OnVolumeControlClicked(EventArgs.Empty);
+                        break;
+                    case MouseButtons.Middle:
+                        model.Muted = !model.Muted;
                         break;
                 }
             };

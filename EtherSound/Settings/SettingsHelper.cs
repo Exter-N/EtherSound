@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using WASCap;
 
 namespace EtherSound.Settings
@@ -33,11 +30,8 @@ namespace EtherSound.Settings
                 return device;
             }
 
-            string desc;
-            int ifNumber;
-            string ifName;
             Dictionary<string, (string, int, string)> cache = new Dictionary<string, (string, int, string)>();
-            if (!TryParseDeviceName(friendlyName, cache, out desc, out ifNumber, out ifName))
+            if (!TryParseDeviceName(friendlyName, cache, out string desc, out int ifNumber, out string ifName))
             {
                 return null;
             }

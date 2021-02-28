@@ -1,10 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EtherSound.Settings
 {
@@ -26,8 +22,10 @@ namespace EtherSound.Settings
             catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(e);
-                settings = new RootSettings();
-                settings.Dirty = true;
+                settings = new RootSettings
+                {
+                    Dirty = true
+                };
             }
         }
 

@@ -1,6 +1,5 @@
 ﻿using Reactivity;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace EtherSound.ViewModel
 {

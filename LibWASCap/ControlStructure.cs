@@ -79,10 +79,10 @@ namespace WASCap
 
         static readonly Dictionary<EChannel, ChannelFactory> channelFactories;
 
-        MemoryMappedFile shm;
-        MemoryMappedViewAccessor shmAccessor;
-        SafeBuffer shmBuffer;
-        unsafe ShmContents* shmBlock;
+        readonly MemoryMappedFile shm;
+        readonly MemoryMappedViewAccessor shmAccessor;
+        readonly SafeBuffer shmBuffer;
+        readonly unsafe ShmContents* shmBlock;
         int cachedChannelMask;
         Channel[] cachedChannels;
 

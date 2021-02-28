@@ -1,9 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 
 using WASCap;
@@ -31,6 +27,7 @@ namespace EtherSound.Settings
 
         public double MasterVolume { get; set; } = 1.0;
         public bool Muted { get; set; } = false;
+        public bool SavedMuted { get; set; } = false;
 
         public double[] ChannelVolumes { get; set; } = new double[ControlStructure.MaxChannels];
 
@@ -104,6 +101,11 @@ namespace EtherSound.Settings
         public bool ShouldSerializeMuted()
         {
             return Muted;
+        }
+
+        public bool ShouldSerializeSavedMuted()
+        {
+            return SavedMuted;
         }
 
         public bool ShouldSerializeChannelVolumes()

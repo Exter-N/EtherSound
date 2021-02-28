@@ -1,5 +1,4 @@
-﻿using EtherSound.Properties;
-using EtherSound.Settings;
+﻿using EtherSound.Settings;
 using EtherSound.View;
 using EtherSound.ViewModel;
 using EtherSound.WebSocket;
@@ -7,16 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 using System.Windows.Threading;
 using WASCap;
 using Application = System.Windows.Forms.Application;
-using MessageBox = System.Windows.Forms.MessageBox;
 using Timer = System.Windows.Forms.Timer;
 
 namespace EtherSound

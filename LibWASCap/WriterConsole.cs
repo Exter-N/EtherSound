@@ -9,12 +9,7 @@ namespace WASCap
 
         public WriterConsole(TextWriter writer)
         {
-            if (null == writer)
-            {
-                throw new ArgumentNullException("writer");
-            }
-
-            this.writer = writer;
+            this.writer = writer ?? throw new ArgumentNullException("writer");
         }
 
         public void Log(string entry)

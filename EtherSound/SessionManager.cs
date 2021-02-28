@@ -3,10 +3,7 @@ using EtherSound.ViewModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using WASCap;
 
 namespace EtherSound
@@ -70,8 +67,7 @@ namespace EtherSound
 
         public void RemoveSession(SessionModel model)
         {
-            CaptureSession session;
-            if (!sessions.TryGetValue(model, out session))
+            if (!sessions.TryGetValue(model, out CaptureSession session))
             {
                 throw new InvalidOperationException();
             }
@@ -112,8 +108,7 @@ namespace EtherSound
 
         void RestartSession(SessionModel model)
         {
-            CaptureSession session;
-            if (!sessions.TryGetValue(model, out session))
+            if (!sessions.TryGetValue(model, out CaptureSession session))
             {
                 return;
             }

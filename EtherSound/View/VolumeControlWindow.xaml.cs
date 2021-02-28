@@ -1,18 +1,9 @@
 ﻿using EtherSound.ViewModel;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Media;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace EtherSound.View
 {
@@ -73,14 +64,27 @@ namespace EtherSound.View
 
         void Swap_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            Mute_MouseUp(sender, e);
-            LocalSound.ToggleMute();
+            switch (e.ChangedButton)
+            {
+                case MouseButton.Left:
+                    Mute_MouseUp(sender, e);
+                    LocalSound.ToggleMute();
+                    break;
+            }
         }
 
         void Mute_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            SessionModel model = GetDataContext<SessionModel>(sender);
-            model.Muted = !model.Muted;
+            switch (e.ChangedButton)
+            {
+                case MouseButton.Left:
+                    SessionModel model = GetDataContext<SessionModel>(sender);
+                    model.Muted = !model.Muted;
+                    break;
+                case MouseButton.Middle:
+                    this.model.Muted = !this.model.Muted;
+                    break;
+            }
         }
 
         #region Slider Event Handlers

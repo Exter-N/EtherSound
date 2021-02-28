@@ -3,10 +3,6 @@ using Reactivity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EtherSound.ViewModel
 {
@@ -117,6 +113,7 @@ namespace EtherSound.ViewModel
                 return masterVolume;
             }));
 
+        [WebSocketExposed]
         public double MasterVolume => MasterVolumeProperty[this];
 
         bool muted;
@@ -125,12 +122,28 @@ namespace EtherSound.ViewModel
             key => Array.TrueForAll(key.ValidSessions, session => session.Muted),
             (key, value) =>
             {
-                foreach (SessionModel session in key.validSessions)
+                if (value == key.muted)
                 {
-                    session.Muted = value;
+                    return;
+                }
+                if (value)
+                {
+                    foreach (SessionModel session in key.validSessions)
+                    {
+                        session.Settings.SavedMuted = session.Muted;
+                        session.Muted = true;
+                    }
+                }
+                else
+                {
+                    foreach (SessionModel session in key.validSessions)
+                    {
+                        session.Muted = session.Settings.SavedMuted;
+                    }
                 }
             }));
 
+        [WebSocketExposed]
         public bool Muted
         {
             get => MutedProperty[this];

@@ -150,7 +150,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="README.md" />
     <None Include="View\Resources\hi.ico" />
   </ItemGroup>
   <ItemGroup>

@@ -1,12 +1,9 @@
-﻿using EtherSound.Properties;
-using EtherSound.Settings;
+﻿using EtherSound.Settings;
 using Reactivity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Windows;
 using System.Windows.Media;
 using WASCap;
 

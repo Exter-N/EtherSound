@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Forms;
 using FColorDialog = System.Windows.Forms.ColorDialog;
 using DColor = System.Drawing.Color;

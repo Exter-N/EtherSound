@@ -35,7 +35,7 @@ namespace EtherSound.ViewModel
 
             Initialize(this, Properties);
 
-            channel.Volume = (float)settings.ChannelVolumes[SessionSettings.GetChannelIndex(channel.Id)];
+            Volume = (float)settings.ChannelVolumes[SessionSettings.GetChannelIndex(channel.Id)];
         }
 
         protected override bool DoUpdateSettings()

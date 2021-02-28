@@ -85,6 +85,11 @@ namespace EtherSound.Settings
             return NetworkSink != null;
         }
 
+        public bool ShouldSerializeCustomName()
+        {
+            return !string.IsNullOrWhiteSpace(CustomName);
+        }
+
         public bool ShouldSerializeColor()
         {
             return Color != Color.FromRgb(0xFF, 0xFF, 0xFF);

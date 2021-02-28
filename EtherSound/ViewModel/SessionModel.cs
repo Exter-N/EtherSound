@@ -37,11 +37,14 @@ namespace EtherSound.ViewModel
                 {
                     return;
                 }
-                if (null == tapData && null == tapStream)
+                lock (this)
                 {
-                    tapStream = ctlS.OpenTapStream();
+                    if (null == tapData && null == tapStream)
+                    {
+                        tapStream = ctlS.OpenTapStream();
+                    }
+                    tapData += value;
                 }
-                tapData += value;
             }
             remove
             {
@@ -49,11 +52,14 @@ namespace EtherSound.ViewModel
                 {
                     return;
                 }
-                tapData -= value;
-                if (null == tapData && null != tapStream)
+                lock (this)
                 {
-                    tapStream.Close();
-                    tapStream = null;
+                    tapData -= value;
+                    if (null == tapData && null != tapStream)
+                    {
+                        tapStream.Close();
+                        tapStream = null;
+                    }
                 }
             }
         }
@@ -380,28 +386,33 @@ namespace EtherSound.ViewModel
             SampleRateProperty.Update(this);
             ChannelMaskProperty.Update(this);
             RawChannelsProperty.Update(this);
-            PollTap();
         }
 
-        void PollTap()
+        public void PollTap()
         {
-            if (null != tapStream)
+            byte[] data = null;
+            lock (this)
             {
-                byte[] data;
-                using (MemoryStream buffer = new MemoryStream())
+                if (null != tapStream)
                 {
-                    byte[] page = new byte[Environment.SystemPageSize];
-                    int n;
-                    while ((n = tapStream.Read(page, 0, page.Length)) > 0)
+                    using (MemoryStream buffer = new MemoryStream())
                     {
-                        buffer.Write(page, 0, n);
+                        byte[] page = new byte[Environment.SystemPageSize];
+                        int n;
+                        while ((n = tapStream.Read(page, 0, page.Length)) > 0)
+                        {
+                            buffer.Write(page, 0, n);
+                        }
+                        if (buffer.Length == 0L)
+                        {
+                            return;
+                        }
+                        data = buffer.ToArray();
                     }
-                    if (buffer.Length == 0L)
-                    {
-                        return;
-                    }
-                    data = buffer.ToArray();
                 }
+            }
+            if (null != data)
+            {
                 OnTapData(new TapDataEventArgs(data));
             }
         }
@@ -503,6 +514,11 @@ namespace EtherSound.ViewModel
 
         protected virtual void OnTapData(TapDataEventArgs e)
         {
+            EventHandler<TapDataEventArgs> tapData;
+            lock (this)
+            {
+                tapData = this.tapData;
+            }
             tapData?.Invoke(this, e);
         }
     }

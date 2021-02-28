@@ -291,12 +291,26 @@ namespace EtherSound.WebSocket
 
         async void SendMessage(string message)
         {
-            await ctx.WebSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(message)), WebSocketMessageType.Text, true, cancel.Token);
+            try
+            {
+                await ctx.WebSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(message)), WebSocketMessageType.Text, true, cancel.Token);
+            }
+            catch (WebSocketException)
+            {
+                Dispose();
+            }
         }
 
         async void SendMessage(byte[] message)
         {
-            await ctx.WebSocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Binary, true, cancel.Token);
+            try
+            {
+                await ctx.WebSocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Binary, true, cancel.Token);
+            }
+            catch (WebSocketException)
+            {
+                Dispose();
+            }
         }
 
         public void Dispose()

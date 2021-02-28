@@ -19,7 +19,7 @@ namespace EtherSound.ViewModel
 
         SessionModel[] sessions;
         static readonly IWritableKeyedRx<RootModel, SessionModel[]> SessionsProperty = Register(Properties, null, KeyedRx.Data(
-            Storage<RootModel>.Create(key => key.sessions, (key, value) => key.sessions = value),
+            Storage<RootModel>.Create(key => key.sessions, (key, value) => { lock (key) key.sessions = value; }),
             key => new SessionModel[0],
             new CollectionEqualityComparer<SessionModel>()))
             .Watch((key, newSessions, oldSessions) =>
@@ -284,6 +284,19 @@ namespace EtherSound.ViewModel
             foreach (SessionModel session in sessions)
             {
                 session.Poll();
+            }
+        }
+
+        public void PollTap()
+        {
+            SessionModel[] sessions;
+            lock (this)
+            {
+                sessions = this.sessions;
+            }
+            foreach (SessionModel session in sessions)
+            {
+                session.PollTap();
             }
         }
 

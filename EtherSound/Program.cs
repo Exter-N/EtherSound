@@ -30,6 +30,7 @@ namespace EtherSound
         readonly Timer saveTimer;
         readonly Timer cursorTimer;
         readonly Timer pollTimer;
+        readonly Thread tapThread;
         readonly TrayIcon trayIcon;
         VolumeControlWindow vcWindow;
         SettingsWindow stWindow;
@@ -49,6 +50,10 @@ namespace EtherSound
             SetTimer(out saveTimer, 3000, delegate { if (ready && suspendSaving == 0) { viewModel.UpdateSettings(); settings.Save(); } });
             SetTimer(out cursorTimer, 1000, delegate { viewModel.UpdateCursor(); });
             SetTimer(out pollTimer, 5, delegate { viewModel.Poll(); });
+
+            tapThread = new Thread(RunTapThread);
+            tapThread.IsBackground = true;
+            tapThread.Start();
 
             trayIcon = new TrayIcon(viewModel);
 
@@ -143,6 +148,25 @@ namespace EtherSound
             };
             timer.Tick += tick;
             timer.Start();
+        }
+
+        void RunTapThread()
+        {
+            int targetTickCount = Environment.TickCount;
+            for (; ; )
+            {
+                viewModel.PollTap();
+                int sleepAmount;
+                unchecked
+                {
+                    targetTickCount += 5;
+                    sleepAmount = targetTickCount - Environment.TickCount;
+                }
+                if (sleepAmount > 0)
+                {
+                    Thread.Sleep(sleepAmount);
+                }
+            }
         }
 
         void ModelPropertyChanged(object sender, PropertyChangedEventArgs e)

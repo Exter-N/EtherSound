@@ -3,7 +3,7 @@
                     xmlns:local="clr-namespace:EtherSound.View"
                     xmlns:conv="clr-namespace:EtherSound.View.Converters"
                     xmlns:clr="clr-namespace:System;assembly=mscorlib"
-                    xmlns:was="clr-namespace:WASCap;assembly=LibWASCap">
+                    xmlns:was="wascap">
     <conv:AddConverter x:Key="AddConverter" />
     <conv:BinarySizeConverter x:Key="BinarySizeConverter" />
     <conv:BrushConverter x:Key="BrushConverter" />

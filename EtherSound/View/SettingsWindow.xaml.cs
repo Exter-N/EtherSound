@@ -78,7 +78,7 @@ namespace EtherSound.View
         private void RemoveSession_Click(object sender, RoutedEventArgs e)
         {
             SessionModel session = model.SelectedSession;
-            if (MessageBox.Show(this, string.Format("Voulez-vous vraiment supprimer la ligne {0} ?{1}{1}Cette opération est irréversible !", session.Name, Environment.NewLine), Title, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) != MessageBoxResult.Yes)
+            if (MessageBox.Show(this, string.Format("Voulez-vous vraiment supprimer la ligne {0} ?{1}{1}Cette opération est irréversible !", session.SourceName, Environment.NewLine), Title, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) != MessageBoxResult.Yes)
             {
                 return;
             }

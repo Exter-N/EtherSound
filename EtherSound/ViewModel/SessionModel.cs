@@ -73,17 +73,38 @@ namespace EtherSound.ViewModel
 
         public ControlStructure ControlStructure => ctlS;
 
-        string name;
-        static readonly IWritableKeyedRx<SessionModel, string> NameProperty = Register(Properties, nameof(Name), KeyedRx.Data(
-            Storage<SessionModel>.Create(key => key.name, (key, value) => key.name = value),
+        string sourceName;
+        static readonly IWritableKeyedRx<SessionModel, string> SourceNameProperty = Register(Properties, nameof(SourceName), KeyedRx.Data(
+            Storage<SessionModel>.Create(key => key.sourceName, (key, value) => key.sourceName = value),
             null));
 
         [WebSocketExposed(Writable = false)]
-        public string Name
+        public string SourceName
         {
-            get => NameProperty[this];
-            set => NameProperty[this] = value;
+            get => SourceNameProperty[this];
+            set => SourceNameProperty[this] = value;
         }
+
+        string customName;
+        static readonly IWritableKeyedRx<SessionModel, string> CustomNameProperty = Register(Properties, nameof(CustomName), KeyedRx.Data(
+            Storage<SessionModel>.Create(key => key.customName, (key, value) => key.customName = value),
+            key => key.settings.CustomName));
+
+        [WebSocketExposed]
+        public string CustomName
+        {
+            get => CustomNameProperty[this];
+            set => CustomNameProperty[this] = value;
+        }
+
+        string name;
+        static readonly IKeyedRx<SessionModel, string> NameProperty = Register(Properties, nameof(Name), KeyedRx.Computed(
+            SourceNameProperty, CustomNameProperty,
+            Storage<SessionModel>.Create(key => key.name, (key, value) => key.name = value),
+            (key, sourceName, customName) => ((string.IsNullOrWhiteSpace(customName) ? sourceName : customName) ?? string.Empty).Trim()));
+
+        [WebSocketExposed]
+        public string Name => NameProperty[this];
 
         bool valid;
         static readonly IWritableKeyedRx<SessionModel, bool> ValidProperty = Register(Properties, nameof(Valid), KeyedRx.Data(
@@ -115,7 +136,7 @@ namespace EtherSound.ViewModel
             color => (color.R << 16) | (color.G << 8) | color.B,
             (rgb, oldColor) => unchecked(Color.FromArgb(oldColor.A, (byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb))));
 
-        [WebSocketExposed(Name = "Color", Writable = true)]
+        [WebSocketExposed(Name = "Color")]
         public int ColorRgb
         {
             get => ColorRgbProperty[this];
@@ -139,7 +160,7 @@ namespace EtherSound.ViewModel
             key => key.ctlS.MasterVolume / key.MaxMasterVolume,
             (key, value) => key.ctlS.MasterVolume = value * key.MaxMasterVolume));
 
-        [WebSocketExposed(Writable = true)]
+        [WebSocketExposed]
         public float MasterVolume
         {
             get => MasterVolumeProperty[this];
@@ -152,7 +173,7 @@ namespace EtherSound.ViewModel
             key => !key.ctlS.Enabled,
             (key, value) => key.ctlS.Enabled = !value));
 
-        [WebSocketExposed(Writable = true)]
+        [WebSocketExposed]
         public bool Muted
         {
             get => MutedProperty[this];
@@ -212,7 +233,7 @@ namespace EtherSound.ViewModel
                 key.MasterVolume = Math.Min(1.0f, key.MasterVolume);
             });
 
-        [WebSocketExposed(Writable = true)]
+        [WebSocketExposed]
         public float MaxMasterVolume
         {
             get => MaxMasterVolumeProperty[this];
@@ -225,7 +246,7 @@ namespace EtherSound.ViewModel
             key => key.ctlS.SilenceThreshold,
             (key, value) => key.ctlS.SilenceThreshold = value));
 
-        [WebSocketExposed(Writable = true)]
+        [WebSocketExposed]
         public float SilenceThreshold
         {
             get => SilenceThresholdProperty[this];
@@ -238,7 +259,7 @@ namespace EtherSound.ViewModel
             key => key.ctlS.AveragingWeight,
             (key, value) => key.ctlS.AveragingWeight = value));
 
-        [WebSocketExposed(Writable = true)]
+        [WebSocketExposed]
         public float AveragingWeight
         {
             get => AveragingWeightProperty[this];
@@ -251,7 +272,7 @@ namespace EtherSound.ViewModel
             key => key.ctlS.SaturationThreshold,
             (key, value) => key.ctlS.SaturationThreshold = value));
 
-        [WebSocketExposed(Writable = true)]
+        [WebSocketExposed]
         public float SaturationThreshold
         {
             get => SaturationThresholdProperty[this];
@@ -264,7 +285,7 @@ namespace EtherSound.ViewModel
             key => key.ctlS.SaturationDebounceFactor,
             (key, value) => key.ctlS.SaturationDebounceFactor = value));
 
-        [WebSocketExposed(Writable = true)]
+        [WebSocketExposed]
         public float SaturationDebounceFactor
         {
             get => SaturationDebounceFactorProperty[this];
@@ -277,7 +298,7 @@ namespace EtherSound.ViewModel
             key => key.ctlS.SaturationRecoveryFactor,
             (key, value) => key.ctlS.SaturationRecoveryFactor = value));
 
-        [WebSocketExposed(Writable = true)]
+        [WebSocketExposed]
         public float SaturationRecoveryFactor
         {
             get => SaturationRecoveryFactorProperty[this];
@@ -433,6 +454,12 @@ namespace EtherSound.ViewModel
         protected override bool DoUpdateSettings()
         {
             bool anyChanged = false;
+
+            if (customName != settings.CustomName)
+            {
+                settings.CustomName = customName;
+                anyChanged = true;
+            }
 
             if (color != settings.Color)
             {

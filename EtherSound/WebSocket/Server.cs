@@ -48,7 +48,7 @@ namespace EtherSound.WebSocket
         {
             set
             {
-                (string prefix, string prefixPath, string relativeUri) = SplitUri(value.Uri);
+                (string prefix, string prefixPath, string relativeUri) = SplitUri(value?.Uri);
                 if (prefix != this.prefix)
                 {
                     this.prefix = prefix;
@@ -63,20 +63,20 @@ namespace EtherSound.WebSocket
                 }
                 this.prefixPath = prefixPath;
                 this.relativeUri = relativeUri;
-                string preSharedSecret = string.IsNullOrWhiteSpace(value.PreSharedSecret) ? null : value.PreSharedSecret.Trim();
+                string preSharedSecret = string.IsNullOrWhiteSpace(value?.PreSharedSecret) ? null : value.PreSharedSecret.Trim();
                 bool pssChanged = preSharedSecret != this.preSharedSecret;
                 if (pssChanged)
                 {
                     this.preSharedSecret = preSharedSecret;
                 }
-                bool permsChanged = globalPerms != value.GlobalPermissions
-                                 || networkPerms != value.NetworkPermissions
-                                 || unauthPerms != value.UnauthenticatedPermissions;
+                bool permsChanged = globalPerms != (value?.GlobalPermissions ?? WebSocketPermissions.DefaultGlobal)
+                                 || networkPerms != (value?.NetworkPermissions ?? WebSocketPermissions.DefaultNetwork)
+                                 || unauthPerms != (value?.UnauthenticatedPermissions ?? WebSocketPermissions.DefaultUnauthenticated);
                 if (permsChanged)
                 {
-                    globalPerms = value.GlobalPermissions;
-                    networkPerms = value.NetworkPermissions;
-                    unauthPerms = value.UnauthenticatedPermissions;
+                    globalPerms = value?.GlobalPermissions ?? WebSocketPermissions.DefaultGlobal;
+                    networkPerms = value?.NetworkPermissions ?? WebSocketPermissions.DefaultNetwork;
+                    unauthPerms = value?.UnauthenticatedPermissions ?? WebSocketPermissions.DefaultUnauthenticated;
                 }
                 if (pssChanged || permsChanged)
                 {
@@ -90,11 +90,11 @@ namespace EtherSound.WebSocket
             this.model = model;
             this.sessions = sessions;
             clients = new HashSet<ClientHandler>();
-            (prefix, prefixPath, relativeUri) = SplitUri(settings.Uri);
-            preSharedSecret = string.IsNullOrWhiteSpace(settings.PreSharedSecret) ? null : settings.PreSharedSecret.Trim();
-            globalPerms = settings.GlobalPermissions;
-            networkPerms = settings.NetworkPermissions;
-            unauthPerms = settings.UnauthenticatedPermissions;
+            (prefix, prefixPath, relativeUri) = SplitUri(settings?.Uri);
+            preSharedSecret = string.IsNullOrWhiteSpace(settings?.PreSharedSecret) ? null : settings.PreSharedSecret.Trim();
+            globalPerms = settings?.GlobalPermissions ?? WebSocketPermissions.DefaultGlobal;
+            networkPerms = settings?.NetworkPermissions ?? WebSocketPermissions.DefaultNetwork;
+            unauthPerms = settings?.UnauthenticatedPermissions ?? WebSocketPermissions.DefaultUnauthenticated;
             model.PropertyChanged += Model_PropertyChanged;
             model.SessionPropertyChanged += Model_SessionPropertyChanged;
             model.ChannelPropertyChanged += Model_ChannelPropertyChanged;

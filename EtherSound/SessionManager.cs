@@ -142,7 +142,7 @@ namespace EtherSound
                 {
                     throw new InvalidOperationException();
                 }
-                model.Name = device.FriendlyName;
+                model.SourceName = device.FriendlyName;
                 model.CanSwap = defSource.Flow == DataFlow.Render && defSource.Role == Role.Console;
             }
             else if (source is CaptureParameters.DeviceWASSourceInfo devSource)
@@ -152,12 +152,12 @@ namespace EtherSound
                 {
                     throw new InvalidOperationException();
                 }
-                model.Name = device.FriendlyName;
+                model.SourceName = device.FriendlyName;
                 model.CanSwap = device.Flow == DataFlow.Render && (device.DefaultFor & Role.Console) != 0;
             }
             else
             {
-                model.Name = "???";
+                model.SourceName = "???";
             }
 
             if (!model.Valid)

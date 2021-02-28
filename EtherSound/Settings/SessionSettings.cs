@@ -21,6 +21,8 @@ namespace EtherSound.Settings
         public WASSinkSettings WASSink { get; set; }
         public NetworkSinkSettings NetworkSink { get; set; }
 
+        public string CustomName { get; set; } = null;
+
         public Color Color { get; set; } = Color.FromRgb(0xFF, 0xFF, 0xFF);
 
         public double MaxMasterVolume { get; set; } = 1.0;

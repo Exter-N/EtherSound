@@ -103,14 +103,17 @@
                     <Grid.RowDefinitions>
                         <RowDefinition />
                         <RowDefinition />
+                        <RowDefinition />
                     </Grid.RowDefinitions>
                     <Label Content="Volume général" Margin="8" Padding="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" />
                     <Slider Grid.Column="1" Margin="8" Maximum="1" Value="{Binding MasterVolume, Mode=TwoWay}" Tag="{Binding MonitorVolume, Mode=OneWay}" LargeChange="0.1" SmallChange="0.01" />
                     <Label Grid.Column="2" Content="{Binding MasterVolume, Converter={StaticResource RoundedPercentageConverter}}" Margin="8" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
                     <Label Content="Sourdine" Margin="8" Padding="0" Grid.Row="1" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" />
                     <CheckBox Grid.Column="1" Margin="8" Grid.Row="1" IsChecked="{Binding Muted, Mode=TwoWay}" VerticalAlignment="Center"/>
-                    <Label Content="Couleur" Margin="8" Padding="0" Grid.Row="1" Grid.Column="4" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" />
-                    <Button Grid.Column="5" Margin="8" Grid.Row="1" Width="40" Height="24" Click="ChangeSessionColor_Click">
+                    <Label Content="Nom" Margin="8" Padding="0" Grid.Row="2" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" />
+                    <TextBox Grid.Column="1" Grid.ColumnSpan="2" Margin="8" Grid.Row="2" TextWrapping="Wrap" Padding="2" Text="{Binding CustomName, Mode=TwoWay}" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" />
+                    <Label Content="Couleur" Margin="8" Padding="0" Grid.Row="2" Grid.Column="4" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" />
+                    <Button Grid.Column="5" Margin="8" Grid.Row="2" Width="40" Height="24" Click="ChangeSessionColor_Click">
                         <Rectangle Fill="{Binding Color, Converter={StaticResource BrushConverter}}" Width="36" Height="20"/>
                     </Button>
                 </Grid>
@@ -121,7 +124,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <Label Content="Source" Margin="8" Padding="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" />
-                    <TextBlock Text="{Binding Name}" Margin="8" Padding="0" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding SourceName}" Margin="8" Padding="0" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                     <Button Content="Changer source / dest." Grid.Column="2" Height="24" Margin="8" Padding="16,0,16,0" Click="ChangeSessionSource_Click" />
                 </Grid>
                 <Label Content="Balance" Margin="8" Template="{StaticResource HeaderLabel}" />

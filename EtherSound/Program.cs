@@ -84,6 +84,7 @@ namespace EtherSound
         [STAThread]
         public static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             Application.EnableVisualStyles();
             dispatcher = Dispatcher.CurrentDispatcher;
             using (Program p = new Program((args.Length > 0) ? args[0] : null))
@@ -111,6 +112,25 @@ namespace EtherSound
         public static async void Queue<T, U>(Func<T, U> action, T parameter)
         {
             await dispatcher.InvokeAsync(() => action(parameter));
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            try
+            {
+                if (e.IsTerminating)
+                {
+                    string logPath = Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                        "EtherSound", "LastCrash.log");
+                    Directory.CreateDirectory(Path.GetDirectoryName(logPath));
+                    File.WriteAllText(logPath, e.ExceptionObject.ToString());
+                }
+            }
+            catch
+            {
+                // This block intentionally left blank.
+            }
         }
 
         public static void SuspendSavingSettings()

@@ -18,6 +18,7 @@ namespace EtherSound.WebSocket
         readonly CancellationTokenSource cancel;
         readonly Dictionary<string, RemoteMethod> methods;
         readonly Dictionary<string, AsyncRemoteMethod> asyncMethods;
+        Queue<(ArraySegment<byte> buffer, WebSocketMessageType messageType)> sendQueue;
 
         protected HttpListenerWebSocketContext Context => ctx;
         protected System.Net.WebSockets.WebSocket WebSocket => ctx.WebSocket;
@@ -28,6 +29,7 @@ namespace EtherSound.WebSocket
             cancel = new CancellationTokenSource();
             methods = new Dictionary<string, RemoteMethod>();
             asyncMethods = new Dictionary<string, AsyncRemoteMethod>();
+            sendQueue = null;
             MainLoop();
         }
 
@@ -289,27 +291,56 @@ namespace EtherSound.WebSocket
             }
         }
 
-        async void SendMessage(string message)
+        void SendMessage(string message)
         {
-            try
-            {
-                await ctx.WebSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(message)), WebSocketMessageType.Text, true, cancel.Token);
-            }
-            catch (WebSocketException)
-            {
-                Dispose();
-            }
+            SendMessage(new ArraySegment<byte>(Encoding.UTF8.GetBytes(message)), WebSocketMessageType.Text);
         }
 
-        async void SendMessage(byte[] message)
+        void SendMessage(byte[] message)
         {
-            try
+            SendMessage(new ArraySegment<byte>(message), WebSocketMessageType.Binary);
+        }
+
+        async void SendMessage(ArraySegment<byte> buffer, WebSocketMessageType messageType)
+        {
+            lock (this)
             {
-                await ctx.WebSocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Binary, true, cancel.Token);
+                if (null != sendQueue)
+                {
+                    sendQueue.Enqueue((buffer, messageType));
+
+                    return;
+                }
+                else
+                {
+                    sendQueue = new Queue<(ArraySegment<byte> buffer, WebSocketMessageType messageType)>();
+                    sendQueue.Enqueue((buffer, messageType));
+                }
             }
-            catch (WebSocketException)
+            for(; ; )
             {
-                Dispose();
+                lock (this)
+                {
+                    if (sendQueue.Count == 0)
+                    {
+                        sendQueue = null;
+
+                        return;
+                    }
+                    (buffer, messageType) = sendQueue.Dequeue();
+                }
+                try
+                {
+                    await ctx.WebSocket.SendAsync(buffer, messageType, true, cancel.Token);
+                }
+                catch (WebSocketException)
+                {
+                    Dispose();
+                    lock (this)
+                    {
+                        sendQueue = null;
+                    }
+                }
             }
         }
 

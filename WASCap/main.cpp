@@ -84,6 +84,13 @@ namespace
 	}
 }
 
+DWORD WINAPI wascap::bind_lifetime(HANDLE hProcess)
+{
+	ExitProcess((WAIT_FAILED == WaitForSingleObject(hProcess, INFINITE)) ? 1 : 0);
+
+	return 0;
+}
+
 int wascap::list_main(const command_line_arguments& arguments)
 {
 	if (arguments.use_message_box) {

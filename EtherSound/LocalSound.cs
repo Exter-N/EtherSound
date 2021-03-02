@@ -12,6 +12,7 @@ namespace EtherSound
 
         [DllImport("user32.dll", EntryPoint = "GetForegroundWindow", ExactSpelling = true)]
         static extern IntPtr GetForegroundWindow();
+
         [DllImport("user32.dll", EntryPoint = "SendMessageW", CharSet = CharSet.Unicode, ExactSpelling = true)]
         static extern IntPtr SendMessage(IntPtr hWnd, int uMessage, IntPtr wParam, IntPtr lParam);
     }

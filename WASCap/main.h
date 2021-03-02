@@ -52,10 +52,13 @@ namespace wascap
 		bool with_shm_averaging_sink = true;
 
 		float duration = INFINITY;
+		HANDLE lifetime_process = nullptr;
 		bool use_message_box = false;
 	};
 
 	void parse_arguments(wascap::command_line_arguments& arguments, const std::vector<std::string>& args);
+
+	DWORD WINAPI bind_lifetime(HANDLE hProcess);
 
 	int help_main(const wascap::command_line_arguments& arguments, const std::exception* exception);
 	int list_main(const wascap::command_line_arguments& arguments);

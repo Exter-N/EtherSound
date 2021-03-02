@@ -41,6 +41,10 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	}
 
 	try {
+		if (arguments.lifetime_process) {
+			CloseHandle(WIN32_CHECK(CreateThread(nullptr, 0, wascap::bind_lifetime, arguments.lifetime_process, 0, nullptr)));
+		}
+
 		switch (arguments.verb) {
 		case wascap::help:
 			return wascap::help_main(arguments, nullptr);

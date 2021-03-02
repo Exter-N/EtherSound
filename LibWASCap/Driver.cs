@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,7 +12,18 @@ namespace WASCap
     {
         public const string ExecutableName = "WASCap.exe";
 
+        static readonly IntPtr waitableCurrentProcess;
+
         public static string ExecutablePath => Path.Combine(Path.GetDirectoryName(typeof(Driver).Assembly.Location), ExecutableName);
+
+        static Driver()
+        {
+            IntPtr currentProcess = GetCurrentProcess();
+            if (!DuplicateHandle(currentProcess, currentProcess, currentProcess, out waitableCurrentProcess, 0x00100000, true, 0))
+            {
+                waitableCurrentProcess = IntPtr.Zero;
+            }
+        }
 
         public static CaptureSession StartCapture(CaptureParameters parameters, IConsole console = null, EventHandler starting = null)
         {
@@ -128,6 +140,10 @@ namespace WASCap
         {
             StringBuilder args = new StringBuilder();
             args.Append("capture");
+            if (IntPtr.Zero != waitableCurrentProcess)
+            {
+                args.AppendFormat(" lifetime {0}", waitableCurrentProcess);
+            }
             if (parameters.Source is CaptureParameters.DeviceWASSourceInfo devSource)
             {
                 args.AppendFormat(" from-was-dev {0}",
@@ -198,5 +214,12 @@ namespace WASCap
 
             return args.ToString();
         }
+
+        [DllImport("kernel32.dll", EntryPoint = "GetCurrentProcess", ExactSpelling = true)]
+        static extern IntPtr GetCurrentProcess();
+
+        [DllImport("kernel32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool DuplicateHandle(IntPtr hSourceProcessHandle, IntPtr hSourceHandle, IntPtr hTargetProcessHandle, out IntPtr lpTargetHandle, int dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, int dwOptions);
     }
 }

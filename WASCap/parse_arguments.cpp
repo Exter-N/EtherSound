@@ -202,6 +202,17 @@ namespace
 				parse_assert(++current != end, "Expected duration");
 				arguments.duration = std::stof(*current);
 			}
+			else if (word == "lifetime") {
+				parse_assert(arguments.lifetime_process == nullptr, "Duplicate lifetime process handle specification");
+				parse_assert(++current != end, "Expected process handle");
+				static_assert(sizeof(HANDLE) == 8 || sizeof(HANDLE) == 4);
+				if constexpr (sizeof(HANDLE) == 8) {
+					arguments.lifetime_process = (HANDLE)std::stoll(*current);
+				}
+				else if constexpr (sizeof(HANDLE) == 4) {
+					arguments.lifetime_process = (HANDLE)std::stoi(*current);
+				}
+			}
 			else {
 				throw wascap::bad_arguments(wascap::util::string_format("Unrecognized option: %s", word));
 			}

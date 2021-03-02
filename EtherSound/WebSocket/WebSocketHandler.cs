@@ -321,6 +321,10 @@ namespace EtherSound.WebSocket
             {
                 lock (this)
                 {
+                    if (null == sendQueue)
+                    {
+                        return;
+                    }
                     if (sendQueue.Count == 0)
                     {
                         sendQueue = null;
@@ -340,6 +344,7 @@ namespace EtherSound.WebSocket
                     {
                         sendQueue = null;
                     }
+                    return;
                 }
             }
         }

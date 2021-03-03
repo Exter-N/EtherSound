@@ -35,6 +35,8 @@ namespace EtherSound
         VolumeControlWindow vcWindow;
         SettingsWindow stWindow;
 
+        public static Version Version => typeof(Program).Assembly.GetName().Version;
+
         public static Dispatcher Dispatcher => dispatcher;
 
         public Program(string settingsPath)
@@ -124,7 +126,11 @@ namespace EtherSound
                         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                         "EtherSound", "LastCrash.log");
                     Directory.CreateDirectory(Path.GetDirectoryName(logPath));
-                    File.WriteAllText(logPath, e.ExceptionObject.ToString());
+                    using (TextWriter logWriter = File.CreateText(logPath))
+                    {
+                        logWriter.WriteLine("EtherSound v{0} - {1}", Version, DateTime.Now);
+                        logWriter.WriteLine(e.ExceptionObject);
+                    }
                 }
             }
             catch

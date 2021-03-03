@@ -41,13 +41,13 @@
                     <Label Content="Adresse locale" Margin="8" Grid.Row="2" Padding="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" />
                     <TextBox Grid.Column="1" Margin="8" Grid.Row="2" TextWrapping="Wrap" Padding="2" Text="{Binding BindAddress}" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" />
                 </Grid>
-                <Label Content="Interface WebSocket" Margin="8" Template="{StaticResource HeaderLabel}" />
+                <Label Content="Contrôle par WebSocket" Margin="8" Template="{StaticResource HeaderLabel}" />
                 <Grid VerticalAlignment="Top">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="140"/>
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <Label Content="URI du serveur" Margin="8" Padding="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" />
+                    <Label Content="URL du serveur" Margin="8" Padding="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" />
                     <TextBox Grid.Column="1" Margin="8" TextWrapping="Wrap" Padding="2" Text="{Binding WebSocketUri}" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" />
                 </Grid>
                 <Grid VerticalAlignment="Top">

@@ -13,6 +13,7 @@
     <conv:OpacityConverter x:Key="OpacityConverter" />
     <conv:ResourceConverter x:Key="ResourceConverter" />
     <conv:RoundedPercentageConverter x:Key="RoundedPercentageConverter" />
+    <conv:StringFormatConverter x:Key="StringFormatConverter" />
     <conv:VisibilityConverter x:Key="VisibilityConverter" />
     <conv:VolumeIconConverter x:Key="VolumeIconConverter" />
     <ControlTemplate TargetType="{x:Type Label}" x:Key="HeaderLabel">
@@ -29,6 +30,24 @@
             <Separator Grid.Column="2" />
         </Grid>
     </ControlTemplate>
+    <Style TargetType="{x:Type TextBox}" x:Key="{x:Type TextBox}">
+        <Style.Setters>
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+        </Style.Setters>
+    </Style>
+    <Style TargetType="{x:Type PasswordBox}" x:Key="{x:Type PasswordBox}">
+        <Style.Setters>
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+        </Style.Setters>
+    </Style>
+    <Style TargetType="{x:Type TextBox}" x:Key="CopyableLabel">
+        <Style.Setters>
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style.Setters>
+    </Style>
     <clr:String x:Key="{x:Static was:Channel.FrontLeft}">Gauche</clr:String>
     <clr:String x:Key="{x:Static was:Channel.FrontRight}">Droit</clr:String>
     <clr:String x:Key="{x:Static was:Channel.FrontCenter}">Centre</clr:String>

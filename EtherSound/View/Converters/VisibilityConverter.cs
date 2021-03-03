@@ -9,11 +9,11 @@ namespace EtherSound.View.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string strParameter = parameter as string;
-            bool invert = strParameter == "I" || strParameter == "IC";
-            bool collapse = strParameter == "C" || strParameter == "IC";
+            string strParameter = (parameter as string) ?? string.Empty;
+            bool invert = strParameter.IndexOf('I') >= 0;
+            bool collapse = strParameter.IndexOf('C') >= 0;
 
-            return ((bool)value ^ invert) ? Visibility.Visible : (collapse ? Visibility.Collapsed : Visibility.Hidden);
+            return (System.Convert.ToBoolean(value) ^ invert) ? Visibility.Visible : (collapse ? Visibility.Collapsed : Visibility.Hidden);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -150,6 +150,23 @@ namespace EtherSound.ViewModel
             set => MutedProperty[this] = value;
         }
 
+        string version;
+        static readonly IKeyedRx<RootModel, string> VersionProperty = Register(Properties, nameof(Version), KeyedRx.Computed(
+            Storage<RootModel>.Create(key => key.version, (key, value) => key.version = value),
+            key =>
+            {
+                string version = "v" + Program.Version;
+                if (version.EndsWith(".0"))
+                {
+                    version = version.Substring(0, version.Length - 2);
+                }
+
+                return version;
+            }));
+
+        [WebSocketExposed]
+        public string Version => VersionProperty[this];
+
         public RootModel(RootSettings settings)
         {
             this.settings = settings;

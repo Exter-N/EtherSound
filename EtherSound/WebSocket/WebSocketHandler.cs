@@ -18,7 +18,7 @@ namespace EtherSound.WebSocket
         readonly CancellationTokenSource cancel;
         readonly Dictionary<string, RemoteMethod> methods;
         readonly Dictionary<string, AsyncRemoteMethod> asyncMethods;
-        Queue<(ArraySegment<byte> buffer, WebSocketMessageType messageType)> sendQueue;
+        Action<(ArraySegment<byte> buffer, WebSocketMessageType messageType)> enqueueSend;
 
         protected HttpListenerWebSocketContext Context => ctx;
         protected System.Net.WebSockets.WebSocket WebSocket => ctx.WebSocket;
@@ -29,7 +29,7 @@ namespace EtherSound.WebSocket
             cancel = new CancellationTokenSource();
             methods = new Dictionary<string, RemoteMethod>();
             asyncMethods = new Dictionary<string, AsyncRemoteMethod>();
-            sendQueue = null;
+            enqueueSend = null;
             MainLoop();
         }
 
@@ -303,35 +303,38 @@ namespace EtherSound.WebSocket
 
         async void SendMessage(ArraySegment<byte> buffer, WebSocketMessageType messageType)
         {
+            Queue<(ArraySegment<byte> buffer, WebSocketMessageType messageType)> queue;
+            Action<(ArraySegment<byte> buffer, WebSocketMessageType messageType)> enqueue;
             lock (this)
             {
-                if (null != sendQueue)
+                if (null != enqueueSend)
                 {
-                    sendQueue.Enqueue((buffer, messageType));
+                    enqueueSend((buffer, messageType));
 
                     return;
                 }
                 else
                 {
-                    sendQueue = new Queue<(ArraySegment<byte> buffer, WebSocketMessageType messageType)>();
-                    sendQueue.Enqueue((buffer, messageType));
+                    queue = new Queue<(ArraySegment<byte> buffer, WebSocketMessageType messageType)>();
+                    queue.Enqueue((buffer, messageType));
+                    enqueue = queue.Enqueue;
+                    enqueueSend = enqueue;
                 }
             }
             for(; ; )
             {
                 lock (this)
                 {
-                    if (null == sendQueue)
+                    if (queue.Count == 0)
                     {
-                        return;
-                    }
-                    if (sendQueue.Count == 0)
-                    {
-                        sendQueue = null;
+                        if (enqueueSend == enqueue)
+                        {
+                            enqueueSend = null;
+                        }
 
                         return;
                     }
-                    (buffer, messageType) = sendQueue.Dequeue();
+                    (buffer, messageType) = queue.Dequeue();
                 }
                 try
                 {
@@ -340,10 +343,6 @@ namespace EtherSound.WebSocket
                 catch (WebSocketException)
                 {
                     Dispose();
-                    lock (this)
-                    {
-                        sendQueue = null;
-                    }
                     return;
                 }
             }
@@ -351,6 +350,10 @@ namespace EtherSound.WebSocket
 
         public void Dispose()
         {
+            lock (this)
+            {
+                enqueueSend = delegate { };
+            }
             cancel.Cancel();
             OnDispose();
             ctx.WebSocket.Dispose();

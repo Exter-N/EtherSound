@@ -112,6 +112,7 @@
     <Compile Include="View\ColorDialog.cs" />
     <Compile Include="View\Converters\IsNotNullConverter.cs" />
     <Compile Include="View\Converters\AddConverter.cs" />
+    <Compile Include="View\Converters\StringFormatConverter.cs" />
     <Compile Include="View\Converters\ResourceConverter.cs" />
     <Compile Include="View\Converters\NullableConverter.cs" />
     <Compile Include="View\NetworkSettingsWindow.xaml.cs">

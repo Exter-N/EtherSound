@@ -8,7 +8,7 @@ namespace EtherSound.View.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (bool)value ? 1.0 : 0.5;
+            return (System.Convert.ToBoolean(value) ? 1.0 : 0.5) * ((null == parameter) ? 1.0 : System.Convert.ToDouble(parameter, CultureInfo.InvariantCulture));
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

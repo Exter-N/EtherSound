@@ -1,8 +1,10 @@
 ﻿using EtherSound.Settings;
+using EtherSound.View;
 using Reactivity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Windows.Media;
 
 namespace EtherSound.ViewModel
 {
@@ -50,10 +52,26 @@ namespace EtherSound.ViewModel
         static readonly IKeyedRx<RootModel, SessionModel[]> ValidSessionsProperty = Register(Properties, nameof(ValidSessions), KeyedRx.Computed(
             SessionsProperty,
             Storage<RootModel>.Create(key => key.validSessions, (key, value) => key.validSessions = value),
-            (key, sessions) => Array.FindAll(sessions, s => s.Valid)))
-            .Watch(key => MutedProperty.Update(key));
+            (key, sessions) => Array.FindAll(sessions, s => s.Valid),
+            new CollectionEqualityComparer<SessionModel>()));
 
         public SessionModel[] ValidSessions => ValidSessionsProperty[this];
+
+        SessionModel[] mixerSessions;
+        static readonly IKeyedRx<RootModel, SessionModel[]> MixerSessionsProperty = Register(Properties, nameof(MixerSessions), KeyedRx.Computed(
+            SessionsProperty,
+            Storage<RootModel>.Create(key => key.mixerSessions, (key, value) => key.mixerSessions = value),
+            (key, validSessions) =>
+            {
+                SessionModel[] mixerSessions = Array.FindAll(validSessions, s => s.ShowInMixer);
+                Array.Reverse(mixerSessions);
+
+                return mixerSessions;
+            },
+            new CollectionEqualityComparer<SessionModel>()))
+            .Watch(key => MutedProperty.Update(key));
+
+        public SessionModel[] MixerSessions => MixerSessionsProperty[this];
 
         SessionModel selectedSession;
         static readonly IWritableKeyedRx<RootModel, SessionModel> SelectedSessionProperty = Register(Properties, nameof(SelectedSession), KeyedRx.Data(
@@ -87,17 +105,17 @@ namespace EtherSound.ViewModel
 
         public bool CanMoveSessionDown => CanMoveSessionDownProperty[this];
 
-        double volumeControlHeight;
-        static readonly IKeyedRx<RootModel, double> VolumeControlHeightProperty = Register(Properties, nameof(VolumeControlHeight), KeyedRx.Computed(
-            ValidSessionsProperty,
-            Storage<RootModel>.Create(key => key.volumeControlHeight, (key, value) => key.volumeControlHeight = value),
-            (key, validSessions) => 48 * validSessions.Length + 8));
+        double mixerHeight;
+        static readonly IKeyedRx<RootModel, double> MixerHeightProperty = Register(Properties, nameof(MixerHeight), KeyedRx.Computed(
+            MixerSessionsProperty,
+            Storage<RootModel>.Create(key => key.mixerHeight, (key, value) => key.mixerHeight = value),
+            (key, mixerSessions) => 48 * mixerSessions.Length + 8));
 
-        public double VolumeControlHeight => VolumeControlHeightProperty[this];
+        public double MixerHeight => MixerHeightProperty[this];
 
         float masterVolume;
         static readonly IKeyedRx<RootModel, float> MasterVolumeProperty = Register(Properties, nameof(MasterVolume), KeyedRx.Computed(
-            ValidSessionsProperty,
+            MixerSessionsProperty,
             Storage<RootModel>.Create(key => key.masterVolume, (key, value) => key.masterVolume = value),
             (key, validSessions) =>
             {
@@ -119,7 +137,7 @@ namespace EtherSound.ViewModel
         bool muted;
         static readonly IWritableKeyedRx<RootModel, bool> MutedProperty = Register(Properties, nameof(Muted), KeyedRx.TwoWayBound(
             Storage<RootModel>.Create(key => key.muted, (key, value) => key.muted = value),
-            key => Array.TrueForAll(key.ValidSessions, session => session.Muted),
+            key => Array.TrueForAll(key.MixerSessions, session => session.Muted),
             (key, value) =>
             {
                 if (value == key.muted)
@@ -128,7 +146,7 @@ namespace EtherSound.ViewModel
                 }
                 if (value)
                 {
-                    foreach (SessionModel session in key.validSessions)
+                    foreach (SessionModel session in key.MixerSessions)
                     {
                         session.Settings.SavedMuted = session.Muted;
                         session.Muted = true;
@@ -136,7 +154,7 @@ namespace EtherSound.ViewModel
                 }
                 else
                 {
-                    foreach (SessionModel session in key.validSessions)
+                    foreach (SessionModel session in key.MixerSessions)
                     {
                         session.Muted = session.Settings.SavedMuted;
                     }
@@ -166,6 +184,25 @@ namespace EtherSound.ViewModel
 
         [WebSocketExposed]
         public string Version => VersionProperty[this];
+
+        bool useDarkMainIcon;
+        static readonly IKeyedRx<RootModel, bool> UseDarkMainIconProperty = Register(Properties, nameof(UseDarkMainIcon), KeyedRx.Computed(
+            Storage<RootModel>.Create(key => key.useDarkMainIcon, (key, value) => key.useDarkMainIcon = value),
+            key =>
+            {
+                if (CompositionHelper.DwmUseAccentColor)
+                {
+                    Color accentColor = CompositionHelper.DwmAccentColor;
+
+                    return accentColor.R * 2 + accentColor.G * 5 + accentColor.B <= 1024;
+                }
+                else
+                {
+                    return false;
+                }
+            }));
+
+        public bool UseDarkMainIcon => UseDarkMainIconProperty[this];
 
         public RootModel(RootSettings settings)
         {
@@ -269,6 +306,9 @@ namespace EtherSound.ViewModel
                 case nameof(SessionModel.Valid):
                     ValidSessionsProperty.Update(this);
                     break;
+                case nameof(SessionModel.ShowInMixer):
+                    MixerSessionsProperty.Update(this);
+                    break;
                 case nameof(SessionModel.MasterVolume):
                     if (session.Valid)
                     {
@@ -294,6 +334,11 @@ namespace EtherSound.ViewModel
         void Session_SettingsUpdated(object sender, EventArgs e)
         {
             settings.Dirty = true;
+        }
+
+        public void UpdateIcon()
+        {
+            UseDarkMainIconProperty.Update(this);
         }
 
         public void Poll()

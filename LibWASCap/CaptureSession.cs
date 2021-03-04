@@ -85,7 +85,16 @@ namespace WASCap
         {
             if (worker != null)
             {
-                Log(string.Format("[{0:HH:mm:ss}] Exited with exit code {1}", worker.ExitTime, worker.ExitCode));
+                string logEntry;
+                try
+                {
+                    logEntry = string.Format("[{0:HH:mm:ss}] Exited with exit code {1}", worker.ExitTime, worker.ExitCode);
+                }
+                catch
+                {
+                    logEntry = string.Format("[{0:HH:mm:ss}] Exited with unknown exit code", DateTime.Now);
+                }
+                Log(logEntry);
                 worker.Dispose();
                 worker = null;
             }
@@ -119,6 +128,7 @@ namespace WASCap
                     {
                         child.WaitForExit(5000);
                         child.Kill();
+                        child.WaitForExit();
                     }
                     catch
                     {
@@ -129,6 +139,7 @@ namespace WASCap
             else
             {
                 child.Kill();
+                child.WaitForExit();
             }
         }
 

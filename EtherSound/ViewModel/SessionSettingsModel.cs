@@ -10,10 +10,13 @@ namespace EtherSound.ViewModel
     {
         new static readonly IList<IKeyedRx<SessionSettingsModel>> Properties = new List<IKeyedRx<SessionSettingsModel>>(SettingsModel.Properties);
 
+        readonly RootModel root;
         readonly RootSettings settings;
         readonly SessionSettings session;
         readonly DeviceModel[] renderDevices;
         readonly DeviceModel[] captureDevices;
+
+        public RootModel Root => root;
 
         bool isNew;
         static readonly IWritableKeyedRx<SessionSettingsModel, bool> IsNewProperty = Register(Properties, nameof(IsNew), KeyedRx.Data(
@@ -156,9 +159,10 @@ namespace EtherSound.ViewModel
 
         public override bool Dirty => DirtyProperty[this];
 
-        public SessionSettingsModel(RootSettings settings, SessionSettings session, Device[] devices, bool isNew)
+        public SessionSettingsModel(RootModel root, SessionSettings session, Device[] devices, bool isNew)
         {
-            this.settings = settings;
+            this.root = root;
+            settings = root.Settings;
             this.session = session;
             this.isNew = isNew;
 

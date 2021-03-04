@@ -1,5 +1,6 @@
 ﻿using EtherSound.View.Converters;
 using EtherSound.ViewModel;
+using Microsoft.Win32;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -30,7 +31,7 @@ namespace EtherSound.View
             {
                 OnVolumeControlClicked(EventArgs.Empty);
             });
-            vcItem.Font = new Font(vcItem.Font, vcItem.Font.Style | System.Drawing.FontStyle.Bold);
+            vcItem.Font = new Font(vcItem.Font, vcItem.Font.Style | FontStyle.Bold);
             trayMenu.Items.Add(vcItem);
             muteItem = new ToolStripMenuItem("Tout mettre en sourdine", null, delegate
             {
@@ -42,7 +43,7 @@ namespace EtherSound.View
             {
                 foreach (SessionModel session in model.Sessions)
                 {
-                    if (session.CanSwap)
+                    if (session.Valid && session.ShowInMixer && session.CanSwap)
                     {
                         session.Muted = !session.Muted;
                     }
@@ -65,6 +66,12 @@ namespace EtherSound.View
                     Application.ExitThread();
                 }
             }));
+
+            SystemEvents.UserPreferenceChanged += delegate
+            {
+                UpdateTrayIconIcon();
+                model.UpdateIcon();
+            };
 
             trayIcon = new NotifyIcon();
             trayIcon.MouseClick += (sender, e) =>
@@ -125,27 +132,18 @@ namespace EtherSound.View
 
         void UpdateTrayIconIcon()
         {
-            if (trayIcon != null)
-            {
-                trayIcon.Icon = VolumeIconConverter.Convert<Icon>(model.Muted, model.MasterVolume);
-            }
+            trayIcon.Icon = VolumeIconConverter.Convert<Icon>(model.Muted, model.MasterVolume);
         }
 
         void UpdateTrayIconText()
         {
-            if (trayIcon != null)
-            {
-                string displayMasterVolume = model.Muted ? "0" : RoundedPercentageConverter.Convert(model.MasterVolume);
-                trayIcon.Text = (displayMasterVolume == "0") ? "EtherSound : muet" : string.Format("EtherSound : {0}%", displayMasterVolume);
-            }
+            string displayMasterVolume = model.Muted ? "0 %" : RoundedPercentageConverter.Convert(model.MasterVolume, "%");
+            trayIcon.Text = (displayMasterVolume == "0 %") ? "EtherSound : muet" : string.Format("EtherSound : {0}", displayMasterVolume);
         }
 
         void UpdateMuteItemChecked()
         {
-            if (muteItem != null)
-            {
-                muteItem.Checked = model.Muted;
-            }
+            muteItem.Checked = model.Muted;
         }
     }
 }

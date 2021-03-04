@@ -9,7 +9,10 @@ namespace EtherSound.ViewModel
     {
         new static readonly IList<IKeyedRx<NetworkSettingsModel>> Properties = new List<IKeyedRx<NetworkSettingsModel>>(SettingsModel.Properties);
 
+        readonly RootModel root;
         readonly RootSettings settings;
+
+        public RootModel Root => root;
 
         bool netDefaultsChanged;
         static readonly IWritableKeyedRx<NetworkSettingsModel, bool> NetworkSinkDefaultsChangedProperty = Register(Properties, nameof(NetworkSinkDefaultsChanged), KeyedRx.Data(
@@ -262,9 +265,10 @@ namespace EtherSound.ViewModel
 
         public override bool Dirty => DirtyProperty[this];
 
-        public NetworkSettingsModel(RootSettings settings)
+        public NetworkSettingsModel(RootModel root)
         {
-            this.settings = settings;
+            this.root = root;
+            settings = root.Settings;
 
             BindAddress = settings.NetworkSinkDefaults?.BindAddress;
             PeerAddress = settings.NetworkSinkDefaults?.PeerAddress;

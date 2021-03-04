@@ -207,11 +207,15 @@ int wascap::capture_main(const command_line_arguments& arguments)
 			? enumerator.default_device(eRender, arguments.sink_role)
 			: enumerator.device_by_id(arguments.sink_device);
 		size_t sink_samplerate = sink_dev.samplerate();
+		DWORD sink_channel_mask = sink_dev.channel_mask();
 
-		s = std::make_unique<sink::null_sink>(sink_samplerate, chain_channel_mask);
+		s = std::make_unique<sink::null_sink>(sink_samplerate, sink_channel_mask);
 		s = std::make_unique<sink::was_sink>(std::move(s), sink_dev);
 		if (before_was_samplerate != s->samplerate()) {
 			s = std::make_unique<sink::samplerate_convert_sink>(std::move(s), before_was_samplerate);
+		}
+		if (chain_channel_mask != s->channel_mask()) {
+			s = std::make_unique<sink::channel_convert_sink>(std::move(s), chain_channel_mask);
 		}
 	}
 	else {

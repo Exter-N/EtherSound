@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using EtherSound.View;
+using Newtonsoft.Json;
 using System;
 using System.Windows.Media;
 
@@ -23,7 +24,9 @@ namespace EtherSound.Settings
 
         public string CustomName { get; set; } = null;
 
-        public Color Color { get; set; } = Color.FromRgb(0xFF, 0xFF, 0xFF);
+        public bool ShowInMixer { get; set; } = true;
+
+        public Color Color { get; set; } = CompositionHelper.SystemUsesLightTheme ? Color.FromRgb(0, 0, 0) : Color.FromRgb(0xFF, 0xFF, 0xFF);
 
         public double MaxMasterVolume { get; set; } = 1.0;
 
@@ -90,9 +93,14 @@ namespace EtherSound.Settings
             return !string.IsNullOrWhiteSpace(CustomName);
         }
 
+        public bool ShouldSerializeShowInMixer()
+        {
+            return !ShowInMixer;
+        }
+
         public bool ShouldSerializeColor()
         {
-            return Color != Color.FromRgb(0xFF, 0xFF, 0xFF);
+            return Color != (CompositionHelper.SystemUsesLightTheme ? Color.FromRgb(0, 0, 0) : Color.FromRgb(0xFF, 0xFF, 0xFF));
         }
 
         public bool ShouldSerializeMaxMasterVolume()

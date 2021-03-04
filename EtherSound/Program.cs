@@ -12,7 +12,8 @@ using System.Windows;
 using System.Windows.Forms.Integration;
 using System.Windows.Threading;
 using WASCap;
-using Application = System.Windows.Forms.Application;
+using WpfApplication = System.Windows.Application;
+using FormsApplication = System.Windows.Forms.Application;
 using Timer = System.Windows.Forms.Timer;
 
 namespace EtherSound
@@ -53,8 +54,10 @@ namespace EtherSound
             SetTimer(out cursorTimer, 1000, delegate { viewModel.UpdateCursor(); });
             SetTimer(out pollTimer, 5, delegate { viewModel.Poll(); });
 
-            tapThread = new Thread(RunTapThread);
-            tapThread.IsBackground = true;
+            tapThread = new Thread(RunTapThread)
+            {
+                IsBackground = true
+            };
             tapThread.Start();
 
             trayIcon = new TrayIcon(viewModel);
@@ -87,12 +90,16 @@ namespace EtherSound
         public static void Main(string[] args)
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            Application.EnableVisualStyles();
+            FormsApplication.EnableVisualStyles();
             dispatcher = Dispatcher.CurrentDispatcher;
+
+            // Trick WPF into thinking this virtual Window is the main one so it doesn't consider the app is shutting down whenever an actual Window is closed.
+            new WpfApplication().MainWindow = new Window();
+
             using (Program p = new Program((args.Length > 0) ? args[0] : null))
             {
                 Queue(p.LoadSettings);
-                Application.Run();
+                FormsApplication.Run();
             }
         }
 

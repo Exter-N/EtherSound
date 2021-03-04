@@ -45,6 +45,7 @@ namespace EtherSound.ViewModel
                     }
                     tapData += value;
                 }
+                Program.Dispatcher.Invoke(() => WithTapStreamProperty.Update(this));
             }
             remove
             {
@@ -61,6 +62,7 @@ namespace EtherSound.ViewModel
                         tapStream = null;
                     }
                 }
+                Program.Dispatcher.Invoke(() => WithTapStreamProperty.Update(this));
             }
         }
 
@@ -84,6 +86,44 @@ namespace EtherSound.ViewModel
             get => SourceNameProperty[this];
             set => SourceNameProperty[this] = value;
         }
+
+        bool withWASSink;
+        static readonly IWritableKeyedRx<SessionModel, bool> WithWASSinkProperty = Register(Properties, nameof(WithWASSink), KeyedRx.Data(
+            Storage<SessionModel>.Create(key => key.withWASSink, (key, value) => key.withWASSink = value),
+            null));
+
+        [WebSocketExposed(Writable = false)]
+        public bool WithWASSink
+        {
+            get => WithWASSinkProperty[this];
+            set => WithWASSinkProperty[this] = value;
+        }
+
+        bool withNetworkSink;
+        static readonly IWritableKeyedRx<SessionModel, bool> WithNetworkSinkProperty = Register(Properties, nameof(WithNetworkSink), KeyedRx.Data(
+            Storage<SessionModel>.Create(key => key.withNetworkSink, (key, value) => key.withNetworkSink = value),
+            null));
+
+        [WebSocketExposed(Writable = false)]
+        public bool WithNetworkSink
+        {
+            get => WithNetworkSinkProperty[this];
+            set => WithNetworkSinkProperty[this] = value;
+        }
+
+        bool withTapStream;
+        static readonly IKeyedRx<SessionModel, bool> WithTapStreamProperty = Register(Properties, nameof(WithTapStream), KeyedRx.Computed(
+            Storage<SessionModel>.Create(key => key.withTapStream, (key, value) => key.withTapStream = value),
+            key =>
+            {
+                lock (key)
+                {
+                    return null != key.tapStream;
+                }
+            }));
+
+        [WebSocketExposed]
+        public bool WithTapStream => WithTapStreamProperty[this];
 
         string customName;
         static readonly IWritableKeyedRx<SessionModel, string> CustomNameProperty = Register(Properties, nameof(CustomName), KeyedRx.Data(
@@ -116,6 +156,19 @@ namespace EtherSound.ViewModel
         {
             get => ValidProperty[this];
             set => ValidProperty[this] = value;
+        }
+
+        bool showInMixer;
+        static readonly IWritableKeyedRx<SessionModel, bool> ShowInMixerProperty = Register(Properties, nameof(ShowInMixer), KeyedRx.TwoWayBound(
+            Storage<SessionModel>.Create(key => key.showInMixer, (key, value) => key.showInMixer = value),
+            key => key.settings.ShowInMixer,
+            (key, value) => key.settings.ShowInMixer = value));
+
+        [WebSocketExposed]
+        public bool ShowInMixer
+        {
+            get => ShowInMixerProperty[this];
+            set => ShowInMixerProperty[this] = value;
         }
 
         Color color;
@@ -305,6 +358,14 @@ namespace EtherSound.ViewModel
             set => SaturationRecoveryFactorProperty[this] = value;
         }
 
+        float saturationEffectiveVolume;
+        static readonly IKeyedRx<SessionModel, float> SaturationEffectiveVolumeProperty = Register(Properties, nameof(SaturationEffectiveVolume), KeyedRx.Computed(
+            Storage<SessionModel>.Create(key => key.saturationEffectiveVolume, (key, value) => key.saturationEffectiveVolume = value),
+            key => key.ctlS.SaturationEffectiveVolume));
+
+        [WebSocketExposed]
+        public float SaturationEffectiveVolume => SaturationEffectiveVolumeProperty[this];
+
         public BufferConsole Console => console;
 
         long lastFrame;
@@ -390,8 +451,7 @@ namespace EtherSound.ViewModel
             AveragingWeight = (float)settings.AveragingWeight;
             SaturationDebounceFactor = (float)settings.SaturationDebounceFactor;
             SaturationRecoveryFactor = (float)settings.SaturationRecoveryFactor;
-            ctlS.SaturationEffectiveVolume = 1.0f;
-            ctlS.SaturationDebounceVolume = 1.0f;
+            ResetSaturation();
             ctlS.Initialized = true;
         }
 
@@ -402,6 +462,7 @@ namespace EtherSound.ViewModel
 
         public void Poll()
         {
+            SaturationEffectiveVolumeProperty.Update(this);
             LastFrameMaxAmplitudeProperty.Update(this);
             LastFrameTickCountProperty.Update(this);
             SampleRateProperty.Update(this);
@@ -444,6 +505,13 @@ namespace EtherSound.ViewModel
             {
                 TapWriteCursorDeltaProperty[this] = 0;
             }
+        }
+
+        public void ResetSaturation()
+        {
+            ctlS.SaturationEffectiveVolume = 1.0f;
+            ctlS.SaturationDebounceVolume = 1.0f;
+            SaturationEffectiveVolumeProperty.Update(this);
         }
 
         void Channel_PropertyChanged(object sender, PropertyChangedEventArgs e)

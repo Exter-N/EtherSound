@@ -7,7 +7,7 @@
         xmlns:vm="clr-namespace:EtherSound.ViewModel"
         d:DataContext="{d:DesignInstance Type=vm:SessionSettingsModel}"
         mc:Ignorable="d"
-        Title="EtherSound – Paramètres de source et destination" Height="600" Width="450" ResizeMode="NoResize" ShowInTaskbar="False">
+        Title="EtherSound – Paramètres de source et destination(s)" Height="600" Width="450" ResizeMode="NoResize" ShowInTaskbar="False">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -15,6 +15,12 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
+    <Window.Icon>
+        <MultiBinding Converter="{StaticResource MainIconConverter}">
+            <Binding Path="Root.UseDarkMainIcon" />
+            <Binding RelativeSource="{RelativeSource Self}" />
+        </MultiBinding>
+    </Window.Icon>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -74,7 +80,14 @@
                     </ItemsControl>
                 </Grid>
                 <Label Margin="8" Template="{StaticResource HeaderLabel}">
-                    <CheckBox IsChecked="{Binding WithWASSink}" Content="Destination locale" />
+                    <CheckBox IsChecked="{Binding WithWASSink}">
+                        <StackPanel Orientation="Horizontal">
+                            <Viewbox Width="16" Height="16" Margin="0,0,2,0" VerticalAlignment="Center">
+                                <Path Width="24" Height="24" Fill="{Binding (TextElement.Foreground), RelativeSource={RelativeSource Self}}" Data="{StaticResource VolumeHigh}" />
+                            </Viewbox>
+                            <TextBlock Text="Destination locale" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </CheckBox>
                 </Label>
                 <Grid VerticalAlignment="Top" IsEnabled="{Binding WithWASSink}">
                     <Grid.ColumnDefinitions>
@@ -85,7 +98,14 @@
                     <ComboBox Grid.Column="1" Margin="8" Grid.ColumnSpan="2" ItemsSource="{Binding SinkDevices}" SelectedItem="{Binding SinkDevice}" />
                 </Grid>
                 <Label Margin="8" Template="{StaticResource HeaderLabel}">
-                    <CheckBox IsChecked="{Binding WithNetworkSink}" Content="Destination réseau" />
+                    <CheckBox IsChecked="{Binding WithNetworkSink}">
+                        <StackPanel Orientation="Horizontal">
+                            <Viewbox Width="16" Height="16" Margin="0,0,2,0" VerticalAlignment="Center">
+                                <Path Width="24" Height="24" Fill="{Binding (TextElement.Foreground), RelativeSource={RelativeSource Self}}" Data="{StaticResource Network}" />
+                            </Viewbox>
+                            <TextBlock Text="Destination réseau" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </CheckBox>
                 </Label>
                 <Grid VerticalAlignment="Top" IsEnabled="{Binding WithNetworkSink}">
                     <Grid.ColumnDefinitions>

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Input;
 using WASCap;
 
 namespace EtherSound.View
@@ -24,6 +25,22 @@ namespace EtherSound.View
             this.model = model;
             InitializeComponent();
             DataContext = model;
+        }
+
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                model.UpdateSettings();
+                DialogResult = true;
+                Close();
+            }
+            else if (e.Key == Key.Escape)
+            {
+                DialogResult = false;
+                Close();
+            }
+            base.OnPreviewKeyDown(e);
         }
 
         private void Accept_Click(object sender, RoutedEventArgs e)

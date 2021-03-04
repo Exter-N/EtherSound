@@ -260,19 +260,6 @@ paket-files/
 __pycache__/
 *.pyc
 
-# These resources might not be redistributable because of copyright
-EtherSound/View/Resources/hi.ico
-EtherSound/View/Resources/hi24.png
-EtherSound/View/Resources/low.ico
-EtherSound/View/Resources/low24.png
-EtherSound/View/Resources/med.ico
-EtherSound/View/Resources/med24.png
-EtherSound/View/Resources/mute.ico
-EtherSound/View/Resources/mute24.png
-EtherSound/View/Resources/no.ico
-EtherSound/View/Resources/no24.png
-EtherSound/View/Resources/swap24.png
-
 # Local-only files/directories
 *.local
 *.local.*

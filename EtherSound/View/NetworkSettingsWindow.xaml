@@ -15,6 +15,12 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
+    <Window.Icon>
+        <MultiBinding Converter="{StaticResource MainIconConverter}">
+            <Binding Path="Root.UseDarkMainIcon" />
+            <Binding RelativeSource="{RelativeSource Self}" />
+        </MultiBinding>
+    </Window.Icon>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />

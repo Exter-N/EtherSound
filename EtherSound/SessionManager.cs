@@ -117,6 +117,7 @@ namespace EtherSound
             {
                 session.Dispose();
             }
+            model.ResetSaturation();
             sessions[model] = StartCapture(model);
         }
 
@@ -159,6 +160,9 @@ namespace EtherSound
             {
                 model.SourceName = "???";
             }
+
+            model.WithNetworkSink = null != settings.NetworkSink;
+            model.WithWASSink = null != settings.WASSink;
 
             if (!model.Valid)
             {

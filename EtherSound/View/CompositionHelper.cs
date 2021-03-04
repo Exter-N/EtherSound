@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 
-namespace EtherSound
+namespace EtherSound.View
 {
     // Copied from or heavily inspired by :
     // https://blogs.msdn.microsoft.com/adam_nathan/2006/05/04/aero-glass-inside-a-wpf-window/
@@ -58,10 +58,46 @@ namespace EtherSound
             }
         }
 
+        public static bool SystemUsesLightTheme
+        {
+            get
+            {
+                using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64))
+                {
+                    return Convert.ToInt32(baseKey.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize").GetValue("SystemUsesLightTheme", 0)) > 0;
+                }
+            }
+        }
+
+        public static Color DwmAccentColor
+        {
+            get
+            {
+                using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64))
+                {
+                    int color = Convert.ToInt32(baseKey.OpenSubKey(@"Software\Microsoft\Windows\DWM").GetValue("AccentColor", 0));
+
+                    return Color.FromArgb((byte)((color >> 24) & 0xFF), (byte)(color & 0xFF), (byte)((color >> 8) & 0xFF), (byte)((color >> 16) & 0xFF));
+                }
+            }
+        }
+
+        public static bool DwmUseAccentColor
+        {
+            get
+            {
+                using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64))
+                {
+                    return Convert.ToInt32(baseKey.OpenSubKey(@"Software\Microsoft\Windows\DWM").GetValue("ColorPrevalence", 0)) > 0;
+                }
+            }
+        }
+
         public static Color Background
         {
             get
             {
+                string theme = SystemUsesLightTheme ? "Light" : "Dark";
                 if (SystemParameters.HighContrast)
                 {
                     return GetImmersiveColor("ImmersiveApplicationBackground", OpaqueAlpha);
@@ -69,12 +105,12 @@ namespace EtherSound
                 else if (UseAccentColor)
                 {
                     return IsTransparencyEnabled
-                        ? GetImmersiveColor("ImmersiveSystemAccentDark2", TransparentBackgroundAlpha)
-                        : GetImmersiveColor("ImmersiveSystemAccentDark1", OpaqueAlpha);
+                        ? GetImmersiveColor("ImmersiveSystemAccent" + theme + "2", TransparentBackgroundAlpha)
+                        : GetImmersiveColor("ImmersiveSystemAccent" + theme + "1", OpaqueAlpha);
                 }
                 else
                 {
-                    return GetImmersiveColor("ImmersiveDarkChromeMedium", IsTransparencyEnabled ? TransparentBackgroundAlpha : OpaqueAlpha);
+                    return GetImmersiveColor("Immersive" + theme + "ChromeMedium", IsTransparencyEnabled ? TransparentBackgroundAlpha : OpaqueAlpha);
                 }
             }
         }
@@ -90,13 +126,17 @@ namespace EtherSound
 
         public static void UpdateResources(ResourceDictionary resources)
         {
+            bool lightTheme = SystemUsesLightTheme;
+            string theme = lightTheme ? "Light" : "Dark";
+            string oppositeTheme = lightTheme ? "Dark" : "Light";
             UpdateSolidColorBrushResource(resources, "WindowBackground", Background);
-            UpdateSolidColorBrushResource(resources, "WindowForeground", GetImmersiveColor("ImmersiveApplicationTextDarkTheme"));
+            UpdateSolidColorBrushResource(resources, "WindowForeground", GetImmersiveColor("ImmersiveApplicationText" + theme + "Theme"));
             UpdateSolidColorBrushResource(resources, "HeaderBackground", GetImmersiveColor("ImmersiveSystemAccent", 51));
             UpdateSolidColorBrushResource(resources, "CottonSwabSliderThumb", GetImmersiveColor("ImmersiveSystemAccent"));
-            UpdateSolidColorBrushResource(resources, "CottonSwabSliderTrackFill", GetImmersiveColor("ImmersiveSystemAccentLight1"));
-            UpdateSolidColorBrushResource(resources, "CottonSwabSliderThumbHover", GetImmersiveColor("ImmersiveControlDarkSliderThumbHover"));
-            UpdateSolidColorBrushResource(resources, "CottonSwabSliderThumbPressed", GetImmersiveColor("ImmersiveControlDarkSliderThumbHover"));
+            UpdateSolidColorBrushResource(resources, "CottonSwabSliderTrackBackground", GetImmersiveColor("ImmersiveApplicationText" + theme + "Theme", 51));
+            UpdateSolidColorBrushResource(resources, "CottonSwabSliderTrackFill", GetImmersiveColor("ImmersiveSystemAccent" + oppositeTheme + "1"));
+            UpdateSolidColorBrushResource(resources, "CottonSwabSliderThumbHover", GetImmersiveColor("ImmersiveControl" + theme + "SliderThumbHover"));
+            UpdateSolidColorBrushResource(resources, "CottonSwabSliderThumbPressed", GetImmersiveColor("ImmersiveControl" + theme + "SliderThumbHover"));
         }
 
         static bool UpdateSolidColorBrushResource(ResourceDictionary resources, object key, Color color)

@@ -86,6 +86,14 @@ namespace WASCap
         int cachedChannelMask;
         Channel[] cachedChannels;
 
+        public static IntPtr TapWriteCursorOffset => Marshal.OffsetOf<ShmContents>(nameof(ShmContents.TapWriteCursor));
+
+        public static IntPtr TapCapacityOffset => Marshal.OffsetOf<ShmContents>(nameof(ShmContents.TapCapacity));
+
+        public static IntPtr SampleRateOffset => Marshal.OffsetOf<ShmContents>(nameof(ShmContents.SampleRate));
+
+        public static IntPtr ChannelMaskOffset => Marshal.OffsetOf<ShmContents>(nameof(ShmContents.ChannelMask));
+
         public string Name { get; }
 
         public bool Initialized
@@ -106,15 +114,11 @@ namespace WASCap
             set => SetFlags(AbortRequestedFlag, value);
         }
 
-        public unsafe int TapWriteCursor
-        {
-            get => shmBlock->TapWriteCursor;
-        }
+        public unsafe int TapOffset => shmBlock->TapOffset;
 
-        public unsafe int TapCapacity
-        {
-            get => shmBlock->TapCapacity;
-        }
+        public unsafe int TapWriteCursor => shmBlock->TapWriteCursor;
+
+        public unsafe int TapCapacity => shmBlock->TapCapacity;
 
         public unsafe float MasterVolume
         {
@@ -272,15 +276,9 @@ namespace WASCap
             set => shmBlock->SaturationEffectiveVolume = value;
         }
 
-        public unsafe int SampleRate
-        {
-            get => shmBlock->SampleRate;
-        }
+        public unsafe int SampleRate => shmBlock->SampleRate;
 
-        public unsafe EChannel ChannelMask
-        {
-            get => (EChannel)shmBlock->ChannelMask;
-        }
+        public unsafe EChannel ChannelMask => (EChannel)shmBlock->ChannelMask;
 
         public unsafe long LastFrameTickCount
         {
@@ -361,10 +359,7 @@ namespace WASCap
             shmBuffer.ReleasePointer();
         }
 
-        unsafe bool TestFlags(int mask)
-        {
-            return (shmBlock->Flags & mask) == mask;
-        }
+        unsafe bool TestFlags(int mask) => (shmBlock->Flags & mask) == mask;
 
         unsafe void SetFlags(int mask, bool value)
         {
@@ -386,10 +381,7 @@ namespace WASCap
             } while (originalFlags != (originalFlags = Interlocked.CompareExchange(ref shmBlock->Flags, flags, originalFlags)));
         }
 
-        public Stream OpenTapStream()
-        {
-            return new TapStream(this);
-        }
+        public Stream OpenTapStream() => new TapStream(this);
 
         public class Channel
         {
@@ -427,10 +419,8 @@ namespace WASCap
                 volumeSetter = volume.GetSetMethod();
             }
 
-            public Channel Create(ControlStructure shm)
-            {
-                return new Channel(ID, (Func<float>)volumeGetter.CreateDelegate(typeof(Func<float>), shm), (Action<float>)volumeSetter.CreateDelegate(typeof(Action<float>), shm));
-            }
+            public Channel Create(ControlStructure shm) =>
+                new Channel(ID, (Func<float>)volumeGetter.CreateDelegate(typeof(Func<float>), shm), (Action<float>)volumeSetter.CreateDelegate(typeof(Action<float>), shm));
         }
 
         private class TapStream : Stream

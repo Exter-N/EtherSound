@@ -8,7 +8,7 @@ namespace EtherSound.View.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return Convert(System.Convert.ToDouble(value));
+            return Convert(System.Convert.ToDouble(value), System.Convert.ToString(parameter));
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -16,9 +16,9 @@ namespace EtherSound.View.Converters
             throw new NotSupportedException();
         }
 
-        public static string Convert(double value)
+        public static string Convert(double value, string parameter)
         {
-            return Math.Round(value * 100.0).ToString();
+            return string.Format("{0} {1}", Math.Round(value * 100.0), parameter).Trim();
         }
     }
 }

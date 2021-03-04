@@ -38,7 +38,7 @@ namespace EtherSound.View
         async void EditSession(SessionSettings settings, bool isNew)
         {
             await sessions.RefreshDevices().ConfigureAwait(true);
-            SessionSettingsModel model = new SessionSettingsModel(this.model.Settings, settings, sessions.Devices, isNew);
+            SessionSettingsModel model = new SessionSettingsModel(this.model, settings, sessions.Devices, isNew);
             model.SettingsUpdated += delegate
             {
                 if (model.IsNew)
@@ -101,7 +101,7 @@ namespace EtherSound.View
 
         private void NetworkSettings_Click(object sender, RoutedEventArgs e)
         {
-            NetworkSettingsModel model = new NetworkSettingsModel(this.model.Settings);
+            NetworkSettingsModel model = new NetworkSettingsModel(this.model);
             model.SettingsUpdated += delegate
             {
                 if (model.NetworkSinkDefaultsChanged)

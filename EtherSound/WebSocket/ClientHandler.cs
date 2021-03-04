@@ -105,6 +105,7 @@ namespace EtherSound.WebSocket
 
             RegisterMethod(nameof(OpenTapStream), OpenTapStream);
             RegisterMethod(nameof(CloseTapStream), CloseTapStream);
+            RegisterMethod(nameof(QueryDirectTapInfo), QueryDirectTapInfo);
 
             UpdatePerms(notify: true);
             if (!initiallySentSessions)
@@ -499,6 +500,29 @@ namespace EtherSound.WebSocket
             tapSessions.Remove(session);
 
             return (null, false);
+        }
+
+        (JToken result, bool binary) QueryDirectTapInfo(JToken @params)
+        {
+            RequirePermissions(WebSocketPermissions.Read | WebSocketPermissions.WriteProperties | WebSocketPermissions.TapStream);
+            if (!Context.IsLocal)
+            {
+                throw new RemoteException(PermissionDenied, "Permission denied");
+            }
+
+            SessionModel session = model.GetSession((int)@params["Session"]) ?? throw new RemoteException(UnknownObject, "Unknown session");
+
+            JObject result = new JObject
+            {
+                ["SharedMemoryName"] = session.ControlStructure.Name,
+                ["TapOffset"] = session.ControlStructure.TapOffset,
+                ["TapWriteCursorOffset"] = ControlStructure.TapWriteCursorOffset.ToInt64(),
+                ["TapCapacityOffset"] = ControlStructure.TapCapacityOffset.ToInt64(),
+                ["SampleRateOffset"] = ControlStructure.SampleRateOffset.ToInt64(),
+                ["ChannelMaskOffset"] = ControlStructure.ChannelMaskOffset.ToInt64()
+            };
+
+            return (result, false);
         }
 
         void Session_TapData(object sender, TapDataEventArgs e)

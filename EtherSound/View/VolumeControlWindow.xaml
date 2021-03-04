@@ -18,7 +18,7 @@
             <SolidColorBrush x:Key="WindowForeground" Color="White" />
             <SolidColorBrush x:Key="WindowBackground" Color="Black" />
             <SolidColorBrush x:Key="HeaderBackground" Color="Black" />
-            <Style x:Key="MuteOpacity" TargetType="Image">
+            <Style x:Key="MuteOpacity" TargetType="Viewbox">
                 <Setter Property="Opacity" Value="0.8"/>
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="true">
@@ -28,12 +28,18 @@
             </Style>
         </ResourceDictionary>
     </Window.Resources>
-    <ItemsControl ItemsSource="{Binding ValidSessions, Mode=OneWay}" Margin="0,4,0,4">
+    <Window.Icon>
+        <MultiBinding Converter="{StaticResource MainIconConverter}">
+            <Binding Path="UseDarkMainIcon" />
+            <Binding RelativeSource="{RelativeSource Self}" />
+        </MultiBinding>
+    </Window.Icon>
+    <ItemsControl ItemsSource="{Binding MixerSessions, Mode=OneWay}" Margin="0,4,0,4">
         <ItemsControl.ItemTemplate>
             <DataTemplate>
                 <Grid Margin="16,4,16,4">
                     <Grid.Effect>
-                        <fx:ColorMultiplyAddEffect Factor="{Binding Color, FallbackValue=White}" />
+                        <fx:ColorMultiplyAddEffect Factor="{Binding Color, Converter={StaticResource ColorFactorConverter}, FallbackValue=White}" Addend="{Binding Color, Converter={StaticResource ColorAddendConverter}, FallbackValue=Black}" />
                     </Grid.Effect>
                     <Grid.CacheMode>
                         <BitmapCache EnableClearType="True" SnapsToDevicePixels="True" />
@@ -47,15 +53,26 @@
                         <ColumnDefinition/>
                         <ColumnDefinition Width="40"/>
                     </Grid.ColumnDefinitions>
-                    <Image Margin="8" Source="Resources/swap24.png" MouseUp="Swap_MouseUp" Style="{StaticResource MuteOpacity}" Visibility="{Binding CanSwap, Converter={StaticResource VisibilityConverter}}"/>
-                    <Image Margin="8" MouseUp="Mute_MouseUp" Style="{StaticResource MuteOpacity}" Grid.Column="1">
-                        <Image.Source>
-                            <MultiBinding Converter="{StaticResource VolumeIconConverter}">
-                                <Binding Path="Muted" />
-                                <Binding Path="MasterVolume" />
-                            </MultiBinding>
-                        </Image.Source>
-                    </Image>
+                    <Viewbox Margin="8" Width="24" Height="24" MouseUp="Swap_MouseUp" Style="{StaticResource MuteOpacity}" Visibility="{Binding CanSwap, Converter={StaticResource VisibilityConverter}}">
+                        <Grid>
+                            <Rectangle Width="24" Height="24" Fill="Transparent" />
+                            <Path Width="24" Height="24" Fill="{Binding (TextElement.Foreground), RelativeSource={RelativeSource Self}}" Data="{StaticResource Swap}" />
+                        </Grid>
+                    </Viewbox>
+                    <Viewbox Margin="8" Width="24" Height="24" MouseUp="Mute_MouseUp" Style="{StaticResource MuteOpacity}" Grid.Column="1">
+                        <Grid>
+                            <Rectangle Width="24" Height="24" Fill="Transparent" />
+                            <Path Width="24" Height="24" Fill="{Binding (TextElement.Foreground), RelativeSource={RelativeSource Self}}">
+                                <Path.Data>
+                                    <MultiBinding Converter="{StaticResource VolumeIconConverter}">
+                                        <Binding Path="Muted" />
+                                        <Binding Path="MasterVolume" />
+                                        <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type Window}}" />
+                                    </MultiBinding>
+                                </Path.Data>
+                            </Path>
+                        </Grid>
+                    </Viewbox>
                     <Slider Grid.Column="2" Margin="8" Value="{Binding MasterVolume, Mode=TwoWay}" Tag="{Binding MonitorVolume, Mode=OneWay}" MouseWheel="Slider_MouseWheel" PreviewMouseDown="Slider_MouseDown" PreviewMouseUp="Slider_MouseUp" MouseMove="Slider_MouseMove" TouchDown="Slider_TouchDown" TouchUp="Slider_TouchUp" TouchMove="Slider_TouchMove" Maximum="1" LargeChange="0.1" SmallChange="0.01"/>
                     <Label Content="{Binding MasterVolume, Converter={StaticResource RoundedPercentageConverter}}" Grid.Column="3" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="{DynamicResource WindowForeground}" FontSize="24" TextOptions.TextFormattingMode="Display" Margin="-8" Padding="0"/>
                 </Grid>

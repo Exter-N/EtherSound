@@ -20,7 +20,7 @@ namespace EtherSound.View
             InitializeComponent();
             CompositionHelper.UpdateResources(Resources);
             DataContext = model;
-            Height = model.VolumeControlHeight;
+            Height = model.MixerHeight;
         }
 
         void TryClose()

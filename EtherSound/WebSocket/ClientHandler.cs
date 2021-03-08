@@ -75,7 +75,10 @@ namespace EtherSound.WebSocket
                         subscribedSessionProperties.Remove(session);
                         subscribedChannelProperties.Remove(session);
                         session.TapData -= Session_TapData;
-                        tapSessions.Remove(session);
+                        lock (tapSessions)
+                        {
+                            tapSessions.Remove(session);
+                        }
                     }
                     NotifySessionsChanged(added);
                 });
@@ -485,9 +488,12 @@ namespace EtherSound.WebSocket
             RequirePermissions(WebSocketPermissions.TapStream);
 
             SessionModel session = model.GetSession((int)@params["Session"]) ?? throw new RemoteException(UnknownObject, "Unknown session");
-            if (tapSessions.Add(session))
+            lock (tapSessions)
             {
-                session.TapData += Session_TapData;
+                if (tapSessions.Add(session))
+                {
+                    session.TapData += Session_TapData;
+                }
             }
 
             return (null, false);
@@ -497,7 +503,10 @@ namespace EtherSound.WebSocket
         {
             SessionModel session = model.GetSession((int)@params["Session"]) ?? throw new RemoteException(UnknownObject, "Unknown session");
             session.TapData -= Session_TapData;
-            tapSessions.Remove(session);
+            lock (tapSessions)
+            {
+                tapSessions.Remove(session);
+            }
 
             return (null, false);
         }
@@ -693,11 +702,14 @@ namespace EtherSound.WebSocket
             }
             if ((perms & WebSocketPermissions.TapStream) == 0)
             {
-                foreach (SessionModel session in tapSessions)
+                lock (tapSessions)
                 {
-                    session.TapData -= Session_TapData;
+                    foreach (SessionModel session in tapSessions)
+                    {
+                        session.TapData -= Session_TapData;
+                    }
+                    tapSessions.Clear();
                 }
-                tapSessions.Clear();
             }
             sessions.Update();
         }
@@ -802,11 +814,14 @@ namespace EtherSound.WebSocket
 
         protected override void OnDispose()
         {
-            foreach (SessionModel session in tapSessions)
+            lock (tapSessions)
             {
-                session.TapData -= Session_TapData;
+                foreach (SessionModel session in tapSessions)
+                {
+                    session.TapData -= Session_TapData;
+                }
+                tapSessions.Clear();
             }
-            tapSessions.Clear();
             onDisposed?.Invoke();
         }
     }
